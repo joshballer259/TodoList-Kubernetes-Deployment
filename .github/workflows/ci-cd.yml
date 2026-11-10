@@ -7,9 +7,13 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   ci:
-    name: Build and Security Scan
+    name: Build, Scan and Push to ECR
     runs-on: ubuntu-latest
 
     steps:
@@ -27,3 +31,21 @@ jobs:
           exit-code: '0'
           severity: CRITICAL,HIGH
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::777724728429:role/GitHubActions-TodoList-ECR
+          aws-region: us-west-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Tag and push Docker image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: todolist
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag todolist:latest $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
