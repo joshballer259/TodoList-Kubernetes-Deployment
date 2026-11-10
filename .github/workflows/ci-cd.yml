@@ -1,7 +1,7 @@
 
 name: TodoList CI/CD Pipeline
 
-'on':
+on:
   push:
     branches:
       - master
@@ -11,4 +11,19 @@ jobs:
   ci:
     name: Build and Security Scan
     runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t todolist:latest .
+
+      - name: Scan Docker image
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: todolist:latest
+          format: table
+          exit-code: '1'
+          severity: CRITICAL,HIGH
 
