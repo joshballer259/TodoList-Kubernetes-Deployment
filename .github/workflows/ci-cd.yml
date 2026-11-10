@@ -20,7 +20,7 @@ jobs:
         run: docker build -t todolist:latest .
 
       - name: Scan Docker image
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: todolist:latest
           format: table
