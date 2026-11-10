@@ -1,1 +1,14 @@
 
+name: TodoList CI/CD Pipeline
+
+'on':
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: Build and Security Scan
+    runs-on: ubuntu-latest
+
